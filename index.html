@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Otimização 10 Dias - Lojinha Prio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .tab-active {
+            border-bottom: 3px solid #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .task-completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .content-collapsed {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .content-expanded {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-rocket text-4xl"></i>
+                    <div>
+                        <h1 class="text-3xl font-bold">Plano de Otimização - Lojinha Prio</h1>
+                        <p class="text-purple-200">10 dias para PageSpeed 85+</p>
+                        <p class="text-sm text-purple-300">https://lojinhaprio.yoobe.app</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-purple-200">Meta</div>
+                    <div class="text-3xl font-bold">85+</div>
+                    <div class="text-sm text-purple-200">PageSpeed Score</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Context Banner -->
+    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+        <div class="container mx-auto px-4">
+            <div class="flex items-start">
+                <i class="fas fa-info-circle text-blue-500 text-xl mr-3 mt-1"></i>
+                <div>
+                    <h3 class="text-blue-800 font-bold mb-1">Contexto Técnico Atual</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-blue-700">
+                        <div><strong>Backend:</strong> Spree Commerce (Rails)</div>
+                        <div><strong>Frontend:</strong> Next Commerce</div>
+                        <div><strong>Banco:</strong> PostgreSQL</div>
+                        <div><strong>Infra:</strong> Google Cloud Platform</div>
+                        <div><strong>Status:</strong> LCP alto, TBT alto, CLS instável</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Overview -->
+    <div class="container mx-auto px-4 py-6">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    <i class="fas fa-chart-line text-purple-600 mr-2"></i>
+                    Progresso Geral
+                </h2>
+                <div class="flex items-center space-x-4">
+                    <button onclick="exportData()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm">
+                        <i class="fas fa-download mr-2"></i>Exportar
+                    </button>
+                    <button onclick="resetProgress()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm">
+                        <i class="fas fa-redo mr-2"></i>Resetar
+                    </button>
+                    <button onclick="saveProgress()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm">
+                        <i class="fas fa-save mr-2"></i>Salvar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-blue-600 text-sm font-semibold mb-1">Dias Completos</div>
+                    <div class="text-3xl font-bold text-blue-700" id="completedDays">0</div>
+                    <div class="text-sm text-blue-600">de 10 dias</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                    <div class="text-green-600 text-sm font-semibold mb-1">Tarefas Completas</div>
+                    <div class="text-3xl font-bold text-green-700" id="completedTasks">0</div>
+                    <div class="text-sm text-green-600">de <span id="totalTasks">0</span> tarefas</div>
+                </div>
+                <div class="bg-purple-50 rounded-lg p-4">
+                    <div class="text-purple-600 text-sm font-semibold mb-1">Score Atual</div>
+                    <div class="text-3xl font-bold text-purple-700" id="currentScore">47</div>
+                    <div class="text-sm text-purple-600">PageSpeed Desktop</div>
+                </div>
+                <div class="bg-orange-50 rounded-lg p-4">
+                    <div class="text-orange-600 text-sm font-semibold mb-1">Projeção Final</div>
+                    <div class="text-3xl font-bold text-orange-700" id="projectedScore">85+</div>
+                    <div class="text-sm text-orange-600">Meta atingível</div>
+                </div>
+            </div>
+
+            <div class="mb-2 flex justify-between text-sm text-gray-600">
+                <span>Progresso Total</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div id="progressBar" class="progress-bar bg-gradient-to-r from-purple-500 to-pink-500 h-4 rounded-full" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Baseline / Target Metrics -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-tachometer-alt text-purple-600 mr-2"></i>
+                Métricas Baseline vs Meta
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600">Métrica</th>
+                            <th class="px-4 py-2 text-center text-xs font-semibold text-gray-600">Antes</th>
+                            <th class="px-4 py-2 text-center text-xs font-semibold text-gray-600">Meta</th>
+                            <th class="px-4 py-2 text-center text-xs font-semibold text-gray-600">Melhoria</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">LCP (Largest Contentful Paint)</td>
+                            <td class="px-4 py-3 text-center text-sm text-red-600 font-bold">4.8s</td>
+                            <td class="px-4 py-3 text-center text-sm text-green-600 font-bold">< 2.5s</td>
+                            <td class="px-4 py-3 text-center text-sm text-blue-600">+48% mais rápido</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">CLS (Cumulative Layout Shift)</td>
+                            <td class="px-4 py-3 text-center text-sm text-red-600 font-bold">0.28</td>
+                            <td class="px-4 py-3 text-center text-sm text-green-600 font-bold">< 0.1</td>
+                            <td class="px-4 py-3 text-center text-sm text-blue-600">Experiência estável</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">TBT (Total Blocking Time)</td>
+                            <td class="px-4 py-3 text-center text-sm text-red-600 font-bold">700ms</td>
+                            <td class="px-4 py-3 text-center text-sm text-green-600 font-bold">< 200ms</td>
+                            <td class="px-4 py-3 text-center text-sm text-blue-600">Navegação fluida</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">TTFB (Time To First Byte)</td>
+                            <td class="px-4 py-3 text-center text-sm text-red-600 font-bold">1.6s</td>
+                            <td class="px-4 py-3 text-center text-sm text-green-600 font-bold">< 0.6s</td>
+                            <td class="px-4 py-3 text-center text-sm text-blue-600">Backend otimizado</td>
+                        </tr>
+                        <tr class="bg-purple-50">
+                            <td class="px-4 py-3 text-sm font-bold text-gray-900">Performance Score</td>
+                            <td class="px-4 py-3 text-center text-sm text-red-600 font-bold">47/100</td>
+                            <td class="px-4 py-3 text-center text-sm text-green-600 font-bold">> 85/100</td>
+                            <td class="px-4 py-3 text-center text-sm text-blue-600 font-bold">Padrão Google Vitals</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-lg shadow-lg mb-6">
+            <div class="border-b border-gray-200">
+                <nav class="flex space-x-8 px-6 overflow-x-auto" aria-label="Tabs">
+                    <button onclick="switchTab('cronograma')" id="tab-cronograma" class="tab-active py-4 px-1 text-sm font-medium whitespace-nowrap">
+                        <i class="fas fa-calendar-alt mr-2"></i>Cronograma
+                    </button>
+                    <button onclick="switchTab('diagnostico')" id="tab-diagnostico" class="py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap">
+                        <i class="fas fa-search mr-2"></i>Diagnóstico
+                    </button>
+                    <button onclick="switchTab('frontend')" id="tab-frontend" class="py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap">
+                        <i class="fas fa-desktop mr-2"></i>Front-end
+                    </button>
+                    <button onclick="switchTab('backend')" id="tab-backend" class="py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap">
+                        <i class="fas fa-server mr-2"></i>Back-end
+                    </button>
+                    <button onclick="switchTab('infra')" id="tab-infra" class="py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap">
+                        <i class="fas fa-cloud mr-2"></i>Infraestrutura
+                    </button>
+                    <button onclick="switchTab('ferramentas')" id="tab-ferramentas" class="py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap">
+                        <i class="fas fa-tools mr-2"></i>Ferramentas IA
+                    </button>
+                    <button onclick="switchTab('metricas')" id="tab-metricas" class="py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap">
+                        <i class="fas fa-chart-bar mr-2"></i>Métricas
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-6">
+                <!-- Cronograma Tab -->
+                <div id="content-cronograma" class="tab-content">
+                    <div class="mb-4 flex justify-end">
+                        <button onclick="openAddTaskModal()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                            <i class="fas fa-plus mr-2"></i>Adicionar Tarefa
+                        </button>
+                    </div>
+                    <div id="daysContainer"></div>
+                </div>
+
+                <!-- Diagnóstico Tab -->
+                <div id="content-diagnostico" class="tab-content hidden">
+                    <div id="diagnosticoContainer"></div>
+                </div>
+
+                <!-- Frontend Tab -->
+                <div id="content-frontend" class="tab-content hidden">
+                    <div id="frontendContainer"></div>
+                </div>
+
+                <!-- Backend Tab -->
+                <div id="content-backend" class="tab-content hidden">
+                    <div id="backendContainer"></div>
+                </div>
+
+                <!-- Infraestrutura Tab -->
+                <div id="content-infra" class="tab-content hidden">
+                    <div id="infraContainer"></div>
+                </div>
+
+                <!-- Ferramentas Tab -->
+                <div id="content-ferramentas" class="tab-content hidden">
+                    <div id="toolsContainer"></div>
+                </div>
+
+                <!-- Métricas Tab -->
+                <div id="content-metricas" class="tab-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white rounded-lg border border-gray-200 p-4">
+                            <h3 class="text-lg font-bold mb-2">Evolução do Score</h3>
+                            <div class="chart-container">
+                                <canvas id="scoreChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg border border-gray-200 p-4">
+                            <h3 class="text-lg font-bold mb-2">Progresso por Dia</h3>
+                            <div class="chart-container">
+                                <canvas id="progressChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg border border-gray-200 p-4">
+                        <h3 class="text-lg font-bold mb-4">Status por Categoria</h3>
+                        <div id="categoryMetrics"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Task -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-gray-800" id="modalTitle">Adicionar Tarefa</h2>
+                <button onclick="closeTaskModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="taskForm" onsubmit="saveTask(event)">
+                <input type="hidden" id="editDayIndex">
+                <input type="hidden" id="editTaskIndex">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dia</label>
+                    <select id="taskDay" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                        <option value="">Selecione o dia</option>
+                        <option value="0">Dia 1-2: Diagnóstico e Monitoramento</option>
+                        <option value="1">Dia 3-5: Front-end</option>
+                        <option value="2">Dia 6-7: Back-end</option>
+                        <option value="3">Dia 8-9: Infraestrutura</option>
+                        <option value="4">Dia 10: Guardrails</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Título da Tarefa</label>
+                    <input type="text" id="taskTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                    <textarea id="taskDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Responsável</label>
+                    <select id="taskResponsible" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                        <option value="">Selecione</option>
+                        <option value="Dev">Dev</option>
+                        <option value="PM">PM</option>
+                        <option value="DevOps">DevOps</option>
+                        <option value="Dev + PM">Dev + PM</option>
+                        <option value="DevOps + PM">DevOps + PM</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Duração</label>
+                    <input type="text" id="taskDuration" placeholder="Ex: 0.5 dia" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" required>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeTaskModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                        Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400">
+                <i class="fas fa-rocket mr-2"></i>
+                Plano de Otimização - Lojinha Prio | 10 Dias para o Sucesso
+            </p>
+            <p class="text-sm text-gray-500 mt-2">
+                "Diagnosticar, Otimizar, Monitorar, Manter"
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Data structure
+        const projectData = {
+            days: [
+                {
+                    day: "1-2",
+                    title: "Diagnóstico e Monitoramento Automático",
+                    description: "Configurar ferramentas de diagnóstico e métricas em tempo real",
+                    category: "diagnostico",
+                    duration: "2 dias",
+                    tasks: [
+                        {
+                            id: "d1t1",
+                            title: "Lighthouse CI (GitHub Action)",
+                            description: "Auditoria contínua de performance. Configurar CI com budgets (LCP ≤ 2.5s, CLS ≤ 0.1, TBT ≤ 200ms)",
+                            problem: "Faltam métricas consistentes por build",
+                            gain: "Visibilidade imediata e controle de regressões",
+                            duration: "0.5 dia",
+                            responsible: "Dev + PM",
+                            completed: false
+                        },
+                        {
+                            id: "d1t2",
+                            title: "Unlighthouse / Perfsee",
+                            description: "Escanear múltiplas rotas rapidamente. Mapear rotas lentas (produto, categorias, carrinho)",
+                            problem: "Diagnóstico isolado apenas da Home",
+                            gain: "Identifica gargalos em todo o site",
+                            duration: "0.5 dia",
+                            responsible: "Dev",
+                            completed: false
+                        },
+                        {
+                            id: "d1t3",
+                            title: "web-vitals (Google)",
+                            description: "Capturar métricas reais de usuários. Inserir script web-vitals no Next.js enviando dados para Logs ou GA4",
+                            problem: "Não há dados RUM (real user metrics)",
+                            gain: "Dados reais para priorização",
+                            duration: "0.5 dia",
+                            responsible: "Dev",
+                            completed: false
+                        },
+                        {
+                            id: "d1t4",
+                            title: "Sentry Performance / Datadog RUM",
+                            description: "Mapear tarefas longas (long tasks JS). Configurar SDK para detectar travamentos e traces lentos",
+                            problem: "JS bloqueando renderização",
+                            gain: "Diagnóstico fino de TBT",
+                            duration: "0.5 dia",
+                            responsible: "Dev",
+                            completed: false
+                        }
+                    ]
+                },
+                {
+                    day: "3-5",
+                    title: "Otimizações de Front-end",
+                    description: "Melhorar LCP, CLS, TBT e carregamento inicial",
+                    category: "frontend",
+                    duration: "3 dias",
+                    tasks: [
+                        {
+                            id: "d2t1",
+                            title: "Otimizar LCP - Imagem Hero",
+                            description: "Usar next/image com priority e sizes corretos + preload",
+                            problem: "Imagem hero grande e sem preload",
+                            gain: "Reduz 0.8–1.2s no carregamento inicial",
+                            duration: "0.5 dia",
+                            responsible: "Dev",
+                            completed: false
+                        },
+                        {
+                            id: "d2t2",
+                            title: "Otimizar Fontes",
+                            description: "Self-host das fontes + font-display: swap. Usar Fontsource ou Google Fonts local",
+                            problem: "Google Fonts externas sem swap bloqueando renderização",
+                            gain: "Reduz FCP e CLS",
+                            duration: "0.5 dia",
+                            responsible: "Dev",
+                            completed: false
+                        },
+                        {
+                            id: "d2t3",
+                            title: "Corrigir CLS (Layout Shift)",
+                            description: "Definir width/height fixos em banners e carrossel com placeholders",
+                            problem: "Banners sem tamanho fixo e carrossel com lazy incorreto",
+                            gain: "CLS < 0.1",
+                            duration: "0.5 dia",
+                            responsible: "Dev",
+                            completed: false
+                        },
+                        {
+                            id: "d2t4",
+                            title: "Reduzir JS excessivo (TBT)",
+                            description: "Import dinâmico (dynamic()) e tree-shaking manual. Usar Next dynamic import + Copilot",
+                            problem: "Widgets e libs antigas rodando acima da dobra",
+                            gain: "TBT reduzido em até 40%",
+                            duration: "1 dia",
+                            responsible: "Dev",
+                            completed: false
+                        },
+                        {
+                            id: "d2t5",
+                            title: "Extrair Critical CSS",
+                            description: "Extrair CSS crítico da Home inline + lazy para resto. Usar Critters ou Next built-in optimizer",
+                            problem: "Estilos grandes atrasando renderização",
+                            gain: "Ganha ~0.3s no LCP",
+                            duration: "0.5 dia",
+                            responsible: "Dev",
+                            completed: false
+                        }
+                    ]
+                },
+                {
+                    day: "6-7",
+                    title: "Backend e Spree Commerce",
+                    description: "Otimizar queries, cache e processamento assíncrono",
+                    category: "backend",
+                    duration: "2 dias",
+                    tasks: [
+                        {
+                            id: "d3t1",
+                            title: "Corrigir N+1 Queries",
+                            description: "Usar includes(:association) e validar com Bullet gem",
+                            problem: "Spree antigo faz queries repetidas em categorias/produtos",
+                            gain: "Até 60% menos queries por request",
+                            duration: "1 dia",
+                            responsible: "Dev",
+                            completed: false
+                        },
+                        {
+                            id: "d3t2",
+                            title: "Implementar Cache Redis",
+                            description: "Fragment caching e view caching com Redis + Spree::CacheStore",
+                            problem: "Nenhum fragment caching ativo",
+                            gain: "Reduz TTFB em 40–60%",
+                            duration: "0.5 dia",
+                            responsible: "Dev",
+                            completed: false
+                        },
+                        {
+                            id: "d3t3",
+                            title: "Otimizar Queries PostgreSQL",
+                            description: "Criar índices em colunas de busca (price, taxons, stock) e configurar PgBouncer. Usar PgHero",
+                            problem: "Falta de índices e pool de conexões",
+                            gain: "Menos latência e menos CPU",
+                            duration: "0.5 dia",
+                            responsible: "Dev",
+                            completed: false
+                        },
+                        {
+                            id: "d3t4",
+                            title: "Jobs Assíncronos com Sidekiq",
+                            description: "Mover tarefas de sync para Sidekiq + Redis",
+                            problem: "Atualizações síncronas travam respostas",
+                            gain: "Reduz TTFB e timeout",
+                            duration: "0.5 dia",
+                            responsible: "Dev",
+                            completed: false
+                        }
+                    ]
+                },
+                {
+                    day: "8-9",
+                    title: "Infraestrutura GCP e CDN",
+                    description: "Configurar CDN, otimizar deploy e cache de assets",
+                    category: "infra",
+                    duration: "2 dias",
+                    tasks: [
+                        {
+                            id: "d4t1",
+                            title: "Configurar Cloud CDN",
+                            description: "Cloud CDN com Brotli e HTTP/2 no GCP Load Balancer",
+                            problem: "TTFB alto - Assets e páginas servidos sem CDN",
+                            gain: "-1.0s TTFB",
+                            duration: "0.5 dia",
+                            responsible: "DevOps + PM",
+                            completed: false
+                        },
+                        {
+                            id: "d4t2",
+                            title: "Cache de Páginas Estáticas",
+                            description: "Headers s-maxage=600, stale-while-revalidate=60. Next.js middleware + CDN rules",
+                            problem: "HTML e assets recarregam a cada acesso",
+                            gain: "20–30% menos requisições",
+                            duration: "0.5 dia",
+                            responsible: "Dev",
+                            completed: false
+                        },
+                        {
+                            id: "d4t3",
+                            title: "Otimizar Deploy Pipeline",
+                            description: "Migrar build para Cloud Build + Cloud Run com otimização de imagens",
+                            problem: "Build demorado e sem otimização",
+                            gain: "Entrega 30% mais rápida",
+                            duration: "1 dia",
+                            responsible: "Dev",
+                            completed: false
+                        }
+                    ]
+                },
+                {
+                    day: "10",
+                    title: "Guardrails e Manutenção Contínua",
+                    description: "Implementar controles de qualidade e documentação",
+                    category: "manutencao",
+                    duration: "1 dia",
+                    tasks: [
+                        {
+                            id: "d5t1",
+                            title: "Lighthouse CI Budgets",
+                            description: "Automatizar alertas se LCP ou CLS piorarem",
+                            problem: "Sem controle de regressões",
+                            gain: "Performance constante",
+                            duration: "0.5 dia",
+                            responsible: "Dev + PM",
+                            completed: false
+                        },
+                        {
+                            id: "d5t2",
+                            title: "Documentação de Padrões",
+                            description: "Criar README com checklists de performance e boas práticas",
+                            problem: "Conhecimento não documentado",
+                            gain: "Reutilização futura",
+                            duration: "0.5 dia",
+                            responsible: "Dev + PM",
+                            completed: false
+                        }
+                    ]
+                }
+            ],
+            tools: [
+                {
+                    name: "GitHub Copilot / Cursor AI",
+                    function: "Reescrita segura de imports dinâmicos, CSS crítico e otimizações JSX",
+                    howHelps: "Acelera refactors pequenos sem quebrar o front",
+                    links: [
+                        { label: "GitHub Copilot", url: "https://github.com/features/copilot" },
+                        { label: "Cursor AI", url: "https://cursor.sh" }
+                    ]
+                },
+                {
+                    name: "OpenDevin / Lovable.dev",
+                    function: "Criação automatizada de tasks a partir de issues Lighthouse",
+                    howHelps: "Converte relatórios em PRs",
+                    links: [
+                        { label: "OpenDevin", url: "https://github.com/OpenDevin/OpenDevin" },
+                        { label: "Lovable.dev", url: "https://lovable.dev" }
+                    ]
+                },
+                {
+                    name: "PageSpeed AI Checker (Chrome Plugin)",
+                    function: "Sugestões automáticas de melhoria em tempo real",
+                    howHelps: "Mostra trechos de código lentos com fix",
+                    links: [
+                        { label: "Chrome Web Store", url: "https://chrome.google.com/webstore/category/extensions" }
+                    ]
+                },
+                {
+                    name: "Datadog APM + AI Root Cause",
+                    function: "Analisa gargalos de backend com explicação causal",
+                    howHelps: "Mostra onde há N+1 ou query lenta",
+                    links: [
+                        { label: "Datadog APM", url: "https://www.datadoghq.com/product/apm/" }
+                    ]
+                },
+                {
+                    name: "Redis Insight",
+                    function: "Interface IA para tuning de cache keys",
+                    howHelps: "Mostra chaves quentes e TTLs otimizáveis",
+                    links: [
+                        { label: "Redis Insight", url: "https://redis.io/insight/" }
+                    ]
+                },
+                {
+                    name: "Claude / GPT-4",
+                    function: "Explica relatórios Lighthouse e cria scripts de correção",
+                    howHelps: "Pode gerar configs automáticas e templates",
+                    links: [
+                        { label: "Claude AI", url: "https://claude.ai" },
+                        { label: "ChatGPT", url: "https://chat.openai.com" }
+                    ]
+                }
+            ]
+        };
+
+        // Load saved data from localStorage
+        function loadSavedData() {
+            const saved = localStorage.getItem('lojinhaprioProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                if (data.tasks) {
+                    Object.keys(data.tasks).forEach(taskId => {
+                        const task = findTaskById(taskId);
+                        if (task) {
+                            task.completed = data.tasks[taskId];
+                        }
+                    });
+                }
+            }
+        }
+
+        // Find task by ID
+        function findTaskById(taskId) {
+            for (const day of projectData.days) {
+                for (const task of day.tasks) {
+                    if (task.id === taskId) {
+                        return task;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // Save progress
+        function saveProgress() {
+            const tasks = {};
+            projectData.days.forEach(day => {
+                day.tasks.forEach(task => {
+                    tasks[task.id] = task.completed;
+                });
+            });
+
+            const data = {
+                tasks: tasks,
+                days: projectData.days,
+                savedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('lojinhaprioProgress', JSON.stringify(data));
+            showNotification('Progresso salvo com sucesso!', 'success');
+        }
+
+        // Reset progress
+        function resetProgress() {
+            if (confirm('Tem certeza que deseja resetar todo o progresso?')) {
+                localStorage.removeItem('lojinhaprioProgress');
+                projectData.days.forEach(day => {
+                    day.tasks.forEach(task => {
+                        task.completed = false;
+                    });
+                });
+                renderAll();
+                showNotification('Progresso resetado!', 'info');
+            }
+        }
+
+        // Export data
+        function exportData() {
+            const data = {
+                exportedAt: new Date().toISOString(),
+                days: projectData.days,
+                tools: projectData.tools
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'lojinhaprio-progress.json';
+            a.click();
+            showNotification('Dados exportados!', 'success');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Toggle task completion
+        function toggleTask(dayIndex, taskIndex) {
+            const day = projectData.days[dayIndex];
+            const task = day.tasks[taskIndex];
+            task.completed = !task.completed;
+            
+            renderDays();
+            updateProgress();
+            saveProgress();
+        }
+
+        // Update progress
+        function updateProgress() {
+            const totalTasks = projectData.days.reduce((sum, day) => sum + day.tasks.length, 0);
+            const completedTasks = projectData.days.reduce((sum, day) => 
+                sum + day.tasks.filter(t => t.completed).length, 0);
+            
+            const completedDays = projectData.days.filter(day => 
+                day.tasks.every(t => t.completed)
+            ).length;
+
+            document.getElementById('completedDays').textContent = completedDays;
+            document.getElementById('completedTasks').textContent = completedTasks;
+            document.getElementById('totalTasks').textContent = totalTasks;
+
+            const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            document.getElementById('progressPercent').textContent = progressPercent + '%';
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            document.querySelectorAll('nav button').forEach(tab => {
+                tab.classList.remove('tab-active');
+                tab.classList.add('text-gray-500');
+            });
+
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+
+            const activeTab = document.getElementById('tab-' + tabName);
+            activeTab.classList.add('tab-active');
+            activeTab.classList.remove('text-gray-500');
+
+            if (tabName === 'metricas') {
+                renderMetrics();
+            }
+        }
+
+        // Render days
+        function renderDays() {
+            const container = document.getElementById('daysContainer');
+            container.innerHTML = '';
+
+            projectData.days.forEach((day, dayIndex) => {
+                const completedTasks = day.tasks.filter(t => t.completed).length;
+                const totalTasks = day.tasks.length;
+                const progressPercent = Math.round((completedTasks / totalTasks) * 100);
+                const isCompleted = completedTasks === totalTasks;
+
+                const dayCard = document.createElement('div');
+                dayCard.className = 'bg-white rounded-lg shadow-md mb-4 overflow-hidden';
+                dayCard.innerHTML = `
+                    <div class="collapsible p-4 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-200 flex items-center justify-between hover:bg-purple-100 transition" onclick="toggleDay(${dayIndex})">
+                        <div class="flex items-center space-x-4 flex-1">
+                            <div class="flex items-center justify-center w-12 h-12 rounded-full ${isCompleted ? 'bg-green-500' : 'bg-purple-500'} text-white font-bold text-lg">
+                                ${isCompleted ? '<i class="fas fa-check"></i>' : day.day}
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-gray-800">Dia ${day.day}: ${day.title}</h3>
+                                <p class="text-gray-600 text-sm">${day.description}</p>
+                                <div class="flex items-center space-x-4 mt-2">
+                                    <span class="text-sm text-gray-600"><i class="fas fa-clock mr-1"></i>${day.duration}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold ${isCompleted ? 'text-green-600' : 'text-gray-700'}">${completedTasks}/${totalTasks}</div>
+                            <div class="text-xs text-gray-500">tarefas</div>
+                        </div>
+                    </div>
+                    
+                    <div id="day-${dayIndex}-content" class="content-collapsed">
+                        <div class="p-4">
+                            <div class="mb-4">
+                                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                    <span>Progresso do Dia</span>
+                                    <span>${progressPercent}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all" style="width: ${progressPercent}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                ${day.tasks.map((task, taskIndex) => `
+                                    <div class="flex items-start space-x-3 p-3 rounded-lg border ${task.completed ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'} hover:shadow-md transition">
+                                        <input 
+                                            type="checkbox" 
+                                            ${task.completed ? 'checked' : ''} 
+                                            onchange="toggleTask(${dayIndex}, ${taskIndex})"
+                                            class="mt-1 w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500 cursor-pointer"
+                                        >
+                                        <div class="flex-1">
+                                            <div class="flex items-start justify-between">
+                                                <h4 class="font-semibold ${task.completed ? 'task-completed' : ''} text-gray-800">${task.title}</h4>
+                                                <div class="flex space-x-2 ml-2">
+                                                    <button onclick="editTask(${dayIndex}, ${taskIndex})" class="text-blue-600 hover:text-blue-800">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button onclick="deleteTask(${dayIndex}, ${taskIndex})" class="text-red-600 hover:text-red-800">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-gray-600 ${task.completed ? 'task-completed' : ''} mt-1">${task.description}</p>
+                                            <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                                                <span><i class="fas fa-user mr-1"></i>${task.responsible}</span>
+                                                <span><i class="fas fa-clock mr-1"></i>${task.duration}</span>
+                                                ${task.gain ? `<span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i>${task.gain}</span>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(dayCard);
+            });
+        }
+
+        // Toggle day expansion
+        function toggleDay(dayIndex) {
+            const content = document.getElementById(`day-${dayIndex}-content`);
+            if (content.classList.contains('content-collapsed')) {
+                content.classList.remove('content-collapsed');
+                content.classList.add('content-expanded');
+            } else {
+                content.classList.remove('content-expanded');
+                content.classList.add('content-collapsed');
+            }
+        }
+
+        // Modal functions
+        function openAddTaskModal() {
+            document.getElementById('modalTitle').textContent = 'Adicionar Tarefa';
+            document.getElementById('taskForm').reset();
+            document.getElementById('editDayIndex').value = '';
+            document.getElementById('editTaskIndex').value = '';
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function editTask(dayIndex, taskIndex) {
+            const task = projectData.days[dayIndex].tasks[taskIndex];
+            
+            document.getElementById('modalTitle').textContent = 'Editar Tarefa';
+            document.getElementById('editDayIndex').value = dayIndex;
+            document.getElementById('editTaskIndex').value = taskIndex;
+            document.getElementById('taskDay').value = dayIndex;
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskDescription').value = task.description;
+            document.getElementById('taskResponsible').value = task.responsible;
+            document.getElementById('taskDuration').value = task.duration;
+            
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function deleteTask(dayIndex, taskIndex) {
+            if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+                projectData.days[dayIndex].tasks.splice(taskIndex, 1);
+                renderDays();
+                updateProgress();
+                saveProgress();
+                showNotification('Tarefa excluída!', 'info');
+            }
+        }
+
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.remove('active');
+        }
+
+        function saveTask(event) {
+            event.preventDefault();
+            
+            const dayIndex = parseInt(document.getElementById('taskDay').value);
+            const editDayIndex = document.getElementById('editDayIndex').value;
+            const editTaskIndex = document.getElementById('editTaskIndex').value;
+            
+            const task = {
+                id: editTaskIndex !== '' ? projectData.days[editDayIndex].tasks[editTaskIndex].id : 'd' + Date.now(),
+                title: document.getElementById('taskTitle').value,
+                description: document.getElementById('taskDescription').value,
+                responsible: document.getElementById('taskResponsible').value,
+                duration: document.getElementById('taskDuration').value,
+                completed: editTaskIndex !== '' ? projectData.days[editDayIndex].tasks[editTaskIndex].completed : false
+            };
+            
+            if (editTaskIndex !== '') {
+                // Edit existing task
+                projectData.days[editDayIndex].tasks[editTaskIndex] = task;
+                showNotification('Tarefa atualizada!', 'success');
+            } else {
+                // Add new task
+                projectData.days[dayIndex].tasks.push(task);
+                showNotification('Tarefa adicionada!', 'success');
+            }
+            
+            closeTaskModal();
+            renderDays();
+            updateProgress();
+            saveProgress();
+        }
+
+        // Render category tabs
+        function renderDiagnostico() {
+            const container = document.getElementById('diagnosticoContainer');
+            const day = projectData.days[0];
+            renderCategoryTasks(container, day);
+        }
+
+        function renderFrontend() {
+            const container = document.getElementById('frontendContainer');
+            const day = projectData.days[1];
+            renderCategoryTasks(container, day);
+        }
+
+        function renderBackend() {
+            const container = document.getElementById('backendContainer');
+            const day = projectData.days[2];
+            renderCategoryTasks(container, day);
+        }
+
+        function renderInfra() {
+            const container = document.getElementById('infraContainer');
+            const day = projectData.days[3];
+            renderCategoryTasks(container, day);
+        }
+
+        function renderCategoryTasks(container, day) {
+            const completedTasks = day.tasks.filter(t => t.completed).length;
+            const totalTasks = day.tasks.length;
+            const progressPercent = Math.round((completedTasks / totalTasks) * 100);
+
+            container.innerHTML = `
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">${day.title}</h2>
+                            <p class="text-gray-600">${day.description}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold text-purple-600">${completedTasks}/${totalTasks}</div>
+                            <div class="text-sm text-gray-600">Tarefas completas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <span>Progresso</span>
+                            <span>${progressPercent}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full" style="width: ${progressPercent}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4">
+                        ${day.tasks.map((task, idx) => `
+                            <div class="bg-white border-l-4 ${task.completed ? 'border-green-500 bg-green-50' : 'border-purple-500'} rounded-lg p-4 shadow">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-start space-x-3 flex-1">
+                                        <input 
+                                            type="checkbox" 
+                                            ${task.completed ? 'checked' : ''} 
+                                            onchange="toggleTask(${projectData.days.indexOf(day)}, ${idx})"
+                                            class="mt-1 w-5 h-5 text-purple-600 rounded cursor-pointer"
+                                        >
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-bold text-gray-800 ${task.completed ? 'task-completed' : ''}">${task.title}</h3>
+                                            <p class="text-gray-600 text-sm mt-1 ${task.completed ? 'task-completed' : ''}">${task.description}</p>
+                                            
+                                            ${task.problem ? `
+                                                <div class="mt-3 p-2 bg-red-50 rounded border-l-2 border-red-400">
+                                                    <div class="text-xs font-semibold text-red-700">Problema:</div>
+                                                    <div class="text-xs text-red-600">${task.problem}</div>
+                                                </div>
+                                            ` : ''}
+                                            
+                                            ${task.gain ? `
+                                                <div class="mt-2 p-2 bg-green-50 rounded border-l-2 border-green-400">
+                                                    <div class="text-xs font-semibold text-green-700">Ganho Esperado:</div>
+                                                    <div class="text-xs text-green-600">${task.gain}</div>
+                                                </div>
+                                            ` : ''}
+                                            
+                                            <div class="flex items-center space-x-4 mt-3 text-xs text-gray-500">
+                                                <span><i class="fas fa-user mr-1"></i>${task.responsible}</span>
+                                                <span><i class="fas fa-clock mr-1"></i>${task.duration}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render tools
+        function renderTools() {
+            const container = document.getElementById('toolsContainer');
+            container.innerHTML = `
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-robot text-purple-600 mr-2"></i>
+                        Ferramentas de IA e Automação
+                    </h2>
+                    <p class="text-gray-600 mb-6">
+                        Ferramentas que podem acelerar diagnóstico, correção e automação das otimizações
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${projectData.tools.map(tool => `
+                        <div class="bg-white border border-purple-200 rounded-lg p-4 hover:shadow-lg transition card-hover">
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">
+                                <i class="fas fa-magic text-purple-600 mr-2"></i>
+                                ${tool.name}
+                            </h3>
+                            <div class="mb-3">
+                                <div class="text-xs font-semibold text-gray-600 mb-1">Função:</div>
+                                <div class="text-sm text-gray-700">${tool.function}</div>
+                            </div>
+                            <div class="p-3 bg-blue-50 rounded border-l-2 border-blue-400 mb-3">
+                                <div class="text-xs font-semibold text-blue-700 mb-1">Como ajuda:</div>
+                                <div class="text-sm text-blue-600">${tool.howHelps}</div>
+                            </div>
+                            ${tool.links && tool.links.length > 0 ? `
+                                <div class="flex flex-wrap gap-2">
+                                    ${tool.links.map(link => `
+                                        <a href="${link.url}" target="_blank" rel="noopener noreferrer" 
+                                           class="inline-flex items-center px-3 py-1 bg-purple-600 text-white text-xs rounded-full hover:bg-purple-700 transition">
+                                            <i class="fas fa-external-link-alt mr-1"></i>
+                                            ${link.label}
+                                        </a>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Render metrics
+        function renderMetrics() {
+            renderScoreChart();
+            renderProgressChart();
+            renderCategoryMetrics();
+        }
+
+        function renderScoreChart() {
+            const ctx = document.getElementById('scoreChart');
+            if (!ctx || ctx.chart) return;
+
+            const baseline = 47;
+            const target = 85;
+            const completedDays = projectData.days.filter(d => d.tasks.every(t => t.completed)).length;
+            const projection = baseline + ((target - baseline) / 10) * completedDays;
+
+            ctx.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Baseline', 'Atual', 'Meta'],
+                    datasets: [{
+                        label: 'PageSpeed Score',
+                        data: [baseline, projection, target],
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 100 } }
+                }
+            });
+        }
+
+        function renderProgressChart() {
+            const ctx = document.getElementById('progressChart');
+            if (!ctx || ctx.chart) return;
+
+            const data = projectData.days.map(day => {
+                const completed = day.tasks.filter(t => t.completed).length;
+                const total = day.tasks.length;
+                return Math.round((completed / total) * 100);
+            });
+
+            ctx.chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: projectData.days.map(d => `Dia ${d.day}`),
+                    datasets: [{
+                        label: 'Progresso (%)',
+                        data: data,
+                        backgroundColor: '#8b5cf6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 100 } }
+                }
+            });
+        }
+
+        function renderCategoryMetrics() {
+            const container = document.getElementById('categoryMetrics');
+            container.innerHTML = `
+                <div class="grid gap-4">
+                    ${projectData.days.map((day, idx) => {
+                        const completed = day.tasks.filter(t => t.completed).length;
+                        const total = day.tasks.length;
+                        const percent = Math.round((completed / total) * 100);
+                        return `
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-gray-800">Dia ${day.day}: ${day.title}</div>
+                                    <div class="text-sm text-gray-600">${completed}/${total} tarefas</div>
+                                </div>
+                                <div class="w-32">
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-purple-600 h-2 rounded-full" style="width: ${percent}%"></div>
+                                    </div>
+                                </div>
+                                <div class="text-lg font-bold text-purple-600 ml-3">${percent}%</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        // Render all
+        function renderAll() {
+            renderDays();
+            renderDiagnostico();
+            renderFrontend();
+            renderBackend();
+            renderInfra();
+            renderTools();
+            updateProgress();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+            renderAll();
+        });
+    </script>
+</body>
+</html>
