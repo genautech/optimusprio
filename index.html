@@ -121,14 +121,31 @@
         <div class="container mx-auto px-4">
             <div class="flex items-start">
                 <i class="fas fa-info-circle text-blue-500 text-xl mr-3 mt-1"></i>
-                <div>
-                    <h3 class="text-blue-800 font-bold mb-1">Contexto Técnico Atual</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-blue-700">
+                <div class="flex-1">
+                    <h3 class="text-blue-800 font-bold mb-2">Contexto Técnico Atual</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-blue-700 mb-3">
                         <div><strong>Backend:</strong> Spree Commerce (Rails)</div>
                         <div><strong>Frontend:</strong> Next Commerce</div>
                         <div><strong>Banco:</strong> PostgreSQL</div>
                         <div><strong>Infra:</strong> Google Cloud Platform</div>
                         <div><strong>Status:</strong> LCP alto, TBT alto, CLS instável</div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="https://lojinhaprio.yoobe.app" target="_blank" rel="noopener noreferrer" 
+                           class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs rounded-full hover:bg-blue-700 transition">
+                            <i class="fas fa-store mr-1"></i>
+                            Frontend (Next.js)
+                        </a>
+                        <a href="https://lojinhaprio.yoobe.io" target="_blank" rel="noopener noreferrer" 
+                           class="inline-flex items-center px-3 py-1 bg-red-600 text-white text-xs rounded-full hover:bg-red-700 transition">
+                            <i class="fas fa-gem mr-1"></i>
+                            Backend (Spree)
+                        </a>
+                        <a href="https://docs.google.com/document/d/1VJE6MUmDChsuSj8oZ43ptekCsR-jfq2J63ng4G86guM/edit?usp=sharing" target="_blank" rel="noopener noreferrer" 
+                           class="inline-flex items-center px-3 py-1 bg-green-600 text-white text-xs rounded-full hover:bg-green-700 transition">
+                            <i class="fas fa-file-alt mr-1"></i>
+                            Plano Completo (Google Docs)
+                        </a>
                     </div>
                 </div>
             </div>
@@ -670,8 +687,11 @@
                     name: "Datadog APM + AI Root Cause",
                     function: "Analisa gargalos de backend com explicação causal",
                     howHelps: "Mostra onde há N+1 ou query lenta",
+                    status: "active",
+                    statusText: "✅ Conta ativa - Convite enviado nos e-mails",
                     links: [
-                        { label: "Datadog APM", url: "https://www.datadoghq.com/product/apm/" }
+                        { label: "Datadog APM", url: "https://www.datadoghq.com/product/apm/" },
+                        { label: "Acessar Datadog", url: "https://app.datadoghq.com" }
                     ]
                 },
                 {
@@ -1119,11 +1139,23 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     ${projectData.tools.map(tool => `
-                        <div class="bg-white border border-purple-200 rounded-lg p-4 hover:shadow-lg transition card-hover">
-                            <h3 class="text-lg font-bold text-gray-800 mb-2">
-                                <i class="fas fa-magic text-purple-600 mr-2"></i>
-                                ${tool.name}
-                            </h3>
+                        <div class="bg-white border ${tool.status === 'active' ? 'border-green-400 bg-green-50' : 'border-purple-200'} rounded-lg p-4 hover:shadow-lg transition card-hover">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="text-lg font-bold text-gray-800 flex-1">
+                                    <i class="fas fa-magic text-purple-600 mr-2"></i>
+                                    ${tool.name}
+                                </h3>
+                                ${tool.status === 'active' ? `
+                                    <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">
+                                        <i class="fas fa-check-circle mr-1"></i>Ativa
+                                    </span>
+                                ` : ''}
+                            </div>
+                            ${tool.statusText ? `
+                                <div class="mb-3 p-2 bg-green-100 border-l-2 border-green-500 rounded">
+                                    <div class="text-sm text-green-800 font-semibold">${tool.statusText}</div>
+                                </div>
+                            ` : ''}
                             <div class="mb-3">
                                 <div class="text-xs font-semibold text-gray-600 mb-1">Função:</div>
                                 <div class="text-sm text-gray-700">${tool.function}</div>

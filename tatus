@@ -1,0 +1,82 @@
+[1mdiff --git a/index.html b/index.html[m
+[1mindex ff04ebf..34cebbd 100644[m
+[1m--- a/index.html[m
+[1m+++ b/index.html[m
+[36m@@ -121,15 +121,32 @@[m
+         <div class="container mx-auto px-4">[m
+             <div class="flex items-start">[m
+                 <i class="fas fa-info-circle text-blue-500 text-xl mr-3 mt-1"></i>[m
+[31m-                <div>[m
+[31m-                    <h3 class="text-blue-800 font-bold mb-1">Contexto Técnico Atual</h3>[m
+[31m-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-blue-700">[m
+[32m+[m[32m                <div class="flex-1">[m
+[32m+[m[32m                    <h3 class="text-blue-800 font-bold mb-2">Contexto Técnico Atual</h3>[m
+[32m+[m[32m                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-blue-700 mb-3">[m
+                         <div><strong>Backend:</strong> Spree Commerce (Rails)</div>[m
+                         <div><strong>Frontend:</strong> Next Commerce</div>[m
+                         <div><strong>Banco:</strong> PostgreSQL</div>[m
+                         <div><strong>Infra:</strong> Google Cloud Platform</div>[m
+                         <div><strong>Status:</strong> LCP alto, TBT alto, CLS instável</div>[m
+                     </div>[m
+[32m+[m[32m                    <div class="flex flex-wrap gap-2">[m
+[32m+[m[32m                        <a href="https://lojinhaprio.yoobe.app" target="_blank" rel="noopener noreferrer"[m[41m [m
+[32m+[m[32m                           class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs rounded-full hover:bg-blue-700 transition">[m
+[32m+[m[32m                            <i class="fas fa-store mr-1"></i>[m
+[32m+[m[32m                            Frontend (Next.js)[m
+[32m+[m[32m                        </a>[m
+[32m+[m[32m                        <a href="https://lojinhaprio.yoobe.io" target="_blank" rel="noopener noreferrer"[m[41m [m
+[32m+[m[32m                           class="inline-flex items-center px-3 py-1 bg-red-600 text-white text-xs rounded-full hover:bg-red-700 transition">[m
+[32m+[m[32m                            <i class="fas fa-gem mr-1"></i>[m
+[32m+[m[32m                            Backend (Spree)[m
+[32m+[m[32m                        </a>[m
+[32m+[m[32m                        <a href="https://docs.google.com/document/d/1VJE6MUmDChsuSj8oZ43ptekCsR-jfq2J63ng4G86guM/edit?usp=sharing" target="_blank" rel="noopener noreferrer"[m[41m [m
+[32m+[m[32m                           class="inline-flex items-center px-3 py-1 bg-green-600 text-white text-xs rounded-full hover:bg-green-700 transition">[m
+[32m+[m[32m                            <i class="fas fa-file-alt mr-1"></i>[m
+[32m+[m[32m                            Plano Completo (Google Docs)[m
+[32m+[m[32m                        </a>[m
+[32m+[m[32m                    </div>[m
+                 </div>[m
+             </div>[m
+         </div>[m
+[36m@@ -670,8 +687,11 @@[m
+                     name: "Datadog APM + AI Root Cause",[m
+                     function: "Analisa gargalos de backend com explicação causal",[m
+                     howHelps: "Mostra onde há N+1 ou query lenta",[m
+[32m+[m[32m                    status: "active",[m
+[32m+[m[32m                    statusText: "✅ Conta ativa - Convite enviado nos e-mails",[m
+                     links: [[m
+[31m-                        { label: "Datadog APM", url: "https://www.datadoghq.com/product/apm/" }[m
+[32m+[m[32m                        { label: "Datadog APM", url: "https://www.datadoghq.com/product/apm/" },[m
+[32m+[m[32m                        { label: "Acessar Datadog", url: "https://app.datadoghq.com" }[m
+                     ][m
+                 },[m
+                 {[m
+[36m@@ -1119,11 +1139,23 @@[m
+ [m
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">[m
+                     ${projectData.tools.map(tool => `[m
+[31m-                        <div class="bg-white border border-purple-200 rounded-lg p-4 hover:shadow-lg transition card-hover">[m
+[31m-                            <h3 class="text-lg font-bold text-gray-800 mb-2">[m
+[31m-                                <i class="fas fa-magic text-purple-600 mr-2"></i>[m
+[31m-                                ${tool.name}[m
+[31m-                            </h3>[m
+[32m+[m[32m                        <div class="bg-white border ${tool.status === 'active' ? 'border-green-400 bg-green-50' : 'border-purple-200'} rounded-lg p-4 hover:shadow-lg transition card-hover">[m
+[32m+[m[32m                            <div class="flex items-start justify-between mb-2">[m
+[32m+[m[32m                                <h3 class="text-lg font-bold text-gray-800 flex-1">[m
+[32m+[m[32m                                    <i class="fas fa-magic text-purple-600 mr-2"></i>[m
+[32m+[m[32m                                    ${tool.name}[m
+[32m+[m[32m                                </h3>[m
+[32m+[m[32m                                ${tool.status === 'active' ? `[m
+[32m+[m[32m                                    <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">[m
+[32m+[m[32m                                        <i class="fas fa-check-circle mr-1"></i>Ativa[m
+[32m+[m[32m                                    </span>[m
+[32m+[m[32m                                ` : ''}[m
+[32m+[m[32m                            </div>[m
+[32m+[m[32m                            ${tool.statusText ? `[m
+[32m+[m[32m                                <div class="mb-3 p-2 bg-green-100 border-l-2 border-green-500 rounded">[m
+[32m+[m[32m                                    <div class="text-sm text-green-800 font-semibold">${tool.statusText}</div>[m
+[32m+[m[32m                                </div>[m
+[32m+[m[32m                            ` : ''}[m
+                             <div class="mb-3">[m
+                                 <div class="text-xs font-semibold text-gray-600 mb-1">Função:</div>[m
+                                 <div class="text-sm text-gray-700">${tool.function}</div>[m
